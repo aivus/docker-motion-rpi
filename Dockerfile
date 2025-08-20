@@ -1,4 +1,4 @@
-FROM debian:buster AS build
+FROM debian:bookworm AS build
 
 # Setup build environment
 RUN export DEBIAN_FRONTEND=noninteractive; \
@@ -22,7 +22,7 @@ RUN git clone https://github.com/Motion-Project/motion.git  && \
    cd .. && \
    rm -fr motion
 
-FROM debian:buster
+FROM debian:bookworm
 LABEL maintainer="TBD"
 
 # Setup Timezone packages and avoid all interaction. This will be overwritten by the user when selecting TZ in the run command
