@@ -1,4 +1,4 @@
-FROM debian:bookworm AS build
+FROM debian:trixie AS build
 
 # Setup build environment
 RUN export DEBIAN_FRONTEND=noninteractive; \
@@ -22,14 +22,14 @@ RUN git clone https://github.com/Motion-Project/motion.git  && \
    cd .. && \
    rm -fr motion
 
-FROM debian:bookworm
+FROM debian:trixie
 LABEL maintainer="TBD"
 
 # Setup Timezone packages and avoid all interaction. This will be overwritten by the user when selecting TZ in the run command
 RUN export DEBIAN_FRONTEND=noninteractive; \
     export DEBCONF_NONINTERACTIVE_SEEN=true; \
     apt-get update -qqy && apt-get install -qqy --option Dpkg::Options::="--force-confnew" --no-install-recommends \
-    tzdata libmicrohttpd12 ca-certificates imagemagick curl wget ffmpeg x264 && \
+    tzdata libmicrohttpd12t64 ca-certificates imagemagick curl wget ffmpeg x264 && \
     apt-get --quiet autoremove --yes && \
     apt-get --quiet --yes clean && \
     rm -rf /var/lib/apt/lists/*
@@ -54,7 +54,4 @@ VOLUME /usr/local/etc/motion
 # R/W needed for motion to update Video & images
 VOLUME /var/lib/motion
 
-CMD test -e /usr/local/etc/motion/motion.conf || \
-    cp /usr/local/etc/motion/motion-dist.conf /usr/local/etc/motion/motion.conf
-
-CMD [ "motion", "-n" ]
+ENTRYPOINT ["/bin/sh", "-c", "test -e /usr/local/etc/motion/motion.conf || cp /usr/local/var/lib/motion/motion-dist.conf /usr/local/etc/motion/motion.conf; exec motion -n"]
